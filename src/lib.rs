@@ -1,10 +1,5 @@
 use std::cmp;
 
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
-
 // tiles representation helpers
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum PieceKind {
@@ -37,8 +32,6 @@ pub struct Piece {
   pub color: Color,
 }
 
-// impl possible moves? for each piece?
-
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Tile {
   None,
@@ -50,7 +43,6 @@ impl Tile {
     Tile::Occupied(Piece { piece_kind: kind, color: color })
   }
 }
-
 
 // history helpers
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -162,34 +154,6 @@ impl Position {
   fn is_knight_pattern(self, position: Position) -> bool {
     (((self.row as i8 - position.row as i8).abs() == 1) || ((self.row as i8 - position.row as i8).abs() == 2)) && (self.manhattan_distance(position) == 3)
   }
-
-  // fn is_valid_pawn_move(self, position: Position, turn: Color) -> bool {
-  //   // or special eller promo
-  //   if turn == Color::White {
-  //     if (self.row == position.row + 1) && (self.column == position.column) {
-  //       return true;
-  //     }
-
-  //     // allow 2 steps forward from beginning row
-  //     if ((self.row == 6) && (position.row == 4) && (self.column == position.column)) {
-  //       return true;
-  //     }
-
-  //     // allow diagonal take
-  //     if (self.row == position.row + 1 && self.manhattan_distance(position) == 2 && )
-  //   } else {
-  //     if (self.row + 1 == position.row) && (self.column == position.column) {
-  //       return true;
-  //     }
-
-  //     // allow 2 steps forward from beginning row
-  //     if ((self.row == 1) && (position.row == 3) && (self.column == position.column)) {
-  //       return true;
-  //     }
-  //   }
-
-  //   false
-  // }
 }
 
 #[derive(Clone)]
@@ -199,9 +163,6 @@ struct HalfMove {
   // took something?
   // promotion?
 }
-
-// impl verify move?
-
 
 #[derive(Clone)]
 pub struct Board {
@@ -269,7 +230,7 @@ impl Board {
     match piece.piece_kind {
       PieceKind::King => {
         from.is_valid_king_movement(to)
-        // or rockad
+        // or castling
       }
       PieceKind::Queen => {
         from.is_unblocked_diagonal_movement(to, self) || from.is_unblocked_straight_movement(to, self)
@@ -354,7 +315,10 @@ impl Board {
   }
 
   pub fn is_check_mate(&self) -> bool {
-    let is_in_check = self.is_in_check(self.turn);
+    let mut new_board = self.clone();
+    new_board.turn = self.turn.swap();
+
+    let is_in_check = new_board.is_in_check(self.turn);
     if is_in_check.is_none() {
       return false;
     }
@@ -459,12 +423,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-
-    #[test]
     fn new_board() {
       let new_board = Board::new();
     }
@@ -536,20 +494,13 @@ mod tests {
 
 
 // todo:
-// fix pawn moves:
-//   2 steps
-//   diagonal step
-//
+// fix special moves:
 //   promotion
 //   en passant
+//   castling
 //
-// rockad
-// 
-// is_unblocked_diagonal_movement
-// 
+// add tests:
+//   is_unblocked_diagonal_movement
+//   ...
+//
 // add comments
-// add tests
-
-
-
-// is_unblocked_diagonal_movement ???
