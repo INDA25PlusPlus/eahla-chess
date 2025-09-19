@@ -465,6 +465,7 @@ mod tests {
 
     #[test]
     fn test_check_mate() {
+      // fool's mate
       let board = Board::new();
 
       // white move
@@ -477,19 +478,165 @@ mod tests {
         panic!();
       };
 
+      // should not be check mate
+      let check_mate = board.is_check_mate();
+      assert!(!check_mate);
+
       // white move
       let Some(board) = board.make_half_move(Position { row: 6, column: 6 }, Position { row: 4, column: 6 }) else {
         panic!();
       };
+
+      // should not be check mate
+      let check_mate = board.is_check_mate();
+      assert!(!check_mate);
 
       // black move
       let Some(board) = board.make_half_move(Position { row: 0, column: 3 }, Position { row: 4, column: 7 }) else {
         panic!();
       };
 
+      // should be check mate
       let check_mate = board.is_check_mate();
       assert!(check_mate);
     }
+
+    #[test]
+    fn test_check_mate_2() {
+      // scholar's mate
+      let board = Board::new();
+
+      // white move pawn
+      let Some(board) = board.make_half_move(Position { row: 6, column: 4 }, Position { row: 4, column: 4 }) else {
+        panic!();
+      };
+
+      // black move
+      let Some(board) = board.make_half_move(Position { row: 1, column: 4 }, Position { row: 3, column: 4 }) else {
+        panic!();
+      };
+
+      // white move bishop
+      let Some(board) = board.make_half_move(Position { row: 7, column: 5 }, Position { row: 4, column: 2 }) else {
+        panic!();
+      };
+
+      // black move
+      let Some(board) = board.make_half_move(Position { row: 0, column: 1 }, Position { row: 2, column: 0 }) else {
+        panic!();
+      };
+
+      // white move queen
+      let Some(board) = board.make_half_move(Position { row: 7, column: 3 }, Position { row: 3, column: 7 }) else {
+        panic!();
+      };
+
+      // should not be check mate
+      let check_mate = board.is_check_mate();
+      assert!(!check_mate);
+
+      // black move
+      let Some(board) = board.make_half_move(Position { row: 0, column: 5 }, Position { row: 3, column: 2 }) else {
+        panic!();
+      };
+
+      // white move queen
+      let Some(board) = board.make_half_move(Position { row: 3, column: 7 }, Position { row: 1, column: 5 }) else {
+        panic!();
+      };
+
+      // should be check mate
+      let check_mate = board.is_check_mate();
+      assert!(check_mate);
+    }
+
+    // test stale mate
+
+    // test double pawn move blocked
+    // test double pawn move not from starting row, backwards moving pawn, wrongly diagonal move pawn
+    #[test]
+    fn test_blocked_2_steps_pawn_move() {
+      let board = Board::new();
+
+      // white move knight
+      let Some(board) = board.make_half_move(Position { row: 7, column: 1 }, Position { row: 5, column: 2 }) else {
+        panic!();
+      };
+
+      // black move
+      let Some(board) = board.make_half_move(Position { row: 1, column: 4 }, Position { row: 3, column: 4 }) else {
+        panic!();
+      };
+
+      // test bad move (white moving blocked pawn)
+      let result = board.make_half_move(Position { row: 6, column: 2 }, Position { row: 4, column: 2 });
+      assert!(result.is_none());
+
+      // test bad move (white moving blocked pawn)
+      let result = board.make_half_move(Position { row: 6, column: 2 }, Position { row: 5, column: 2 });
+      assert!(result.is_none());
+
+      // white move pawn
+      let Some(board) = board.make_half_move(Position { row: 6, column: 7 }, Position { row: 5, column: 7 }) else {
+        panic!();
+      };
+
+      // black move
+      let Some(board) = board.make_half_move(Position { row: 3, column: 4 }, Position { row: 4, column: 4 }) else {
+        panic!();
+      };
+
+      // test bad move (white moving blocked pawn)
+      let result = board.make_half_move(Position { row: 6, column: 4 }, Position { row: 4, column: 4 });
+      assert!(result.is_none());
+
+      // test bad move (white moving diagonal pawn with nothing to take)
+      let result = board.make_half_move(Position { row: 6, column: 4 }, Position { row: 5, column: 5 });
+      assert!(result.is_none());
+
+      // test bad move (white moving pawn that's not on row 6 two steps)
+      let result = board.make_half_move(Position { row: 5, column: 7 }, Position { row: 3, column: 7 });
+      assert!(result.is_none());
+
+      // white move knight
+      let Some(board) = board.make_half_move(Position { row: 5, column: 2 }, Position { row: 4, column: 0 }) else {
+        panic!();
+      };
+
+      // test bad move (black moving pawn wrong way)
+      let result = board.make_half_move(Position { row: 4, column: 4 }, Position { row: 3, column: 4 });
+      assert!(result.is_none());
+
+      // black move
+      let Some(board) = board.make_half_move(Position { row: 4, column: 4 }, Position { row: 5, column: 4 }) else {
+        panic!();
+      };
+
+      // test bad move (white moving blocked pawn)
+      let result = board.make_half_move(Position { row: 6, column: 4 }, Position { row: 4, column: 4 });
+      assert!(result.is_none());
+
+      // test bad move (white moving blocked pawn)
+      let result = board.make_half_move(Position { row: 6, column: 4 }, Position { row: 5, column: 4 });
+      assert!(result.is_none());
+
+      // test bad move (white moving pawn wrong way)
+      let result = board.make_half_move(Position { row: 5, column: 7 }, Position { row: 6, column: 7 });
+      assert!(result.is_none());
+
+      // white move pawn diagonal
+      let Some(board) = board.make_half_move(Position { row: 6, column: 3 }, Position { row: 5, column: 4 }) else {
+        panic!();
+      };
+    }
+
+    // test moves putting own king in check
+
+    // test out of bounds
+
+    // 
+
+    // test special moves
 }
 
 
